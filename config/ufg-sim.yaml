@@ -1,0 +1,68 @@
+
+labels:
+  0: "unlabled"
+  4: "road"
+  5: "city-terrain"
+  7: "oak-tree"
+  9: "playground"
+  12: "lamp-post"
+  20: "radio-tower"
+  40: "apartment"
+  42: "fast-food"
+  55: "bus"
+  60: "pickup"
+  65: "suv"
+  80: "stop-sign"
+
+color_map: #bgr
+  0: [0, 0, 0]
+  4: [255, 0, 255]
+  5: [80, 240, 150]
+  7: [0, 175, 0]
+  9: [255, 0, 0]
+  12: [150, 240, 255]
+  20: [255, 150, 255]
+  40: [0, 200, 255]
+  42: [50, 120, 255]
+  55: [250, 80, 100]
+  60: [180, 30, 80]
+  65: [245, 150, 100]
+  80: [0, 0, 255]
+
+learning_map:
+  0 : 0     # "unlabled"
+  4 : 1     # "road"
+  5 : 2     # "city-terrain"
+  7 : 3     # "oak-tree"
+  9 : 4     # "playground"
+  12: 5     # "lamp-post"
+  20: 6     # "radio-tower"
+  40: 7     # "apartment"
+  42: 8     # "fast-food"
+  55: 9     # "bus"
+  60: 10    # "pickup"
+  65: 11    # "suv"
+  80: 12    # "stop-sign"
+
+learning_map_inv:
+  0 : 0     # "unlabled"
+  1 : 4     # "road"
+  2 : 5     # "city-terrain"
+  3 : 7     # "oak-tree"
+  4 : 9     # "playground"
+  5 : 12    # "lamp-post"
+  6 : 20    # "radio-tower"
+  7 : 40    # "apartment"
+  8 : 42    # "fast-food"
+  9 : 55    # "bus"
+  10: 60    # "pickup"
+  11: 65    # "suv"
+  12: 80    # "stop-sign"
+
+split:
+  train:
+      - 1
+  valid:
+      - 2
+  test:
+      - 0
