@@ -89,19 +89,7 @@ class RIUNetInferencer(Node):
 		# Convert to float32 before passing to the model
 		frame = item['frame'].astype(np.float32)
 				
-		ldm = SemanticSegmentationSimLDM()
-		ldm.setup('predict')
-		epoch_steps = len(ldm.predict_dataloader())
-		n_epochs = 25
-		model = self.model
-		loss_fn =  CrossEntropyLoss(reduction='none')
-		viz_tfm = ldm.viz_tfm
-		total_steps = n_epochs*epoch_steps
-		
-		loaded_model = SemanticSegmentationTask.load_from_checkpoint(
-			self.model_path, model=model, loss_fn=loss_fn, viz_tfm=viz_tfm, total_steps=total_steps
-			)
-		
+		loaded_model = torch.load(self.model_path)
 		loaded_model.to(self.device)
 		loaded_model.eval()
 		
