@@ -1,5 +1,10 @@
 from colorcloud.UFGsim2024infufg import SemanticSegmentationSimLDM, ProjectionSimTransform, ProjectionSimVizTransform
-from colorcloud.biasutti2019riu import SemanticSegmentationTask, RIUNet
+
+from colorcloud.biasutti2019riu import RIUNet
+from colorcloud.biasutti2019riu import SemanticSegmentationTask as RIUTask
+from colorcloud.chen2020mvlidarnet import MVLidarNet
+from colorcloud.chen2020mvlidarnet import SemanticSegmentationTask as MVLidarTask
+
 from colorcloud.behley2019iccv import SphericalProjection
 import rclpy
 from rclpy.node import Node
@@ -15,26 +20,31 @@ import yaml
 import os
 from ament_index_python.packages import get_package_share_directory
 
-class RIUNetInferencer(Node):
+class SIMModelInferencer(Node):
 	def __init__(self):
-		super().__init__('riunet_sim')
+		super().__init__('model_sim')
 		'''
 		future parameters
 		'''
+        self.declare_parameter('model_name', 'RIUNet')
+        self.declare_parameter('in_channels', 4)
+        self.declare_parameter('n_classes', 13)
 		self.declare_parameter('fov_up', 15.0)
 		self.declare_parameter('fov_down', -15.0)
 		self.declare_parameter('width', 440)
 		self.declare_parameter('height', 16)
-		self.declare_parameter('yaml_path', os.path.join(get_package_share_directory('ufgsim_pkg'),'config','ufg-sim.yaml'))
-		self.declare_parameter('model_path', '')
-        
+        self.declare_parameter('yaml_path', '../../model/ufg-sim.yaml')
+        self.declare_parameter('model_path', '../../model/ufgsim_mvlidarnet.ckpt')
+
+        model_name = self.get_parameter('model_name').get_parameter_value().string_value
+        in_channels = self.get_parameter('in_channels').get_parameter_value().integer_value
+        n_classes = self.get_parameter('n_classes').get_parameter_value().integer_value
 		fov_up = self.get_parameter('fov_up').get_parameter_value().double_value
 		fov_down = self.get_parameter('fov_down').get_parameter_value().double_value
 		width = self.get_parameter('width').get_parameter_value().integer_value
 		height = self.get_parameter('height').get_parameter_value().integer_value
 		yaml_path = self.get_parameter('yaml_path').get_parameter_value().string_value
 		self.model_path = self.get_parameter('model_path').get_parameter_value().string_value
-  	    		
 
 		self.spherical_projection = SphericalProjection(fov_up, fov_down, width, height)
 		
@@ -48,7 +58,7 @@ class RIUNetInferencer(Node):
 		)
 		self.publisher = self.create_publisher(Image, '/segmentation_riunet', 10)
 		self.bridge = CvBridge()
-		self.model = RIUNet(in_channels=4, hidden_channels=(64, 128, 256, 512), n_classes=13) 
+		self.model, self.task_class = self.load_model(model_name, in_channels, n_classes)
 		self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 		
 		with open(yaml_path, 'r') as file:
@@ -72,6 +82,21 @@ class RIUNetInferencer(Node):
 			self.color_map_rgb_np[k] = np.array(v[::-1], np.float32)
 		
 		self.projectionviz_transform = ProjectionSimVizTransform(self.color_map_rgb_np, self.learning_map_inv_np)
+    
+    def load_model(self, model_name, in_channels, n_classes):
+        """
+        Dynamically load the model class based on the model_name parameter.
+        """
+        if model_name == 'RIUNet':
+            model = RIUNet(in_channels=in_channels, hidden_channels=(64, 128, 256, 512), n_classes=n_classes)
+            task_class = RIUTask
+        elif model_name == 'MVLidarNet':
+            model =  MVLidarNet(in_channels=in_channels, n_classes=n_classes)
+            task_class = MVLidarTask
+        else:
+            raise ValueError(f"Model {model_name} not supported")
+
+        return model, task_class
 		
 	def inference_callback(self, msg):
 		pointcloud = structured_to_unstructured(pointcloud2_to_array(msg))
@@ -94,13 +119,14 @@ class RIUNetInferencer(Node):
 		epoch_steps = len(ldm.predict_dataloader())
 		n_epochs = 25
 		model = self.model
+        semantic_task = self.task_class
 		loss_fn =  CrossEntropyLoss(reduction='none')
 		viz_tfm = ldm.viz_tfm
 		total_steps = n_epochs*epoch_steps
 		
-		loaded_model = SemanticSegmentationTask.load_from_checkpoint(
+		loaded_model = semantic_task.load_from_checkpoint(
 			self.model_path, model=model, loss_fn=loss_fn, viz_tfm=viz_tfm, total_steps=total_steps
-			)
+		)
 		
 		loaded_model.to(self.device)
 		loaded_model.eval()
@@ -124,14 +150,14 @@ class RIUNetInferencer(Node):
 		
 def main(args=None):
 	rclpy.init(args=args)
-	riunet_inferencer = RIUNetInferencer()
+	model_inferencer = SIMModelInferencer()
 	
 	try:
-		rclpy.spin(riunet_inferencer)
+		rclpy.spin(model_inferencer)
 	except KeyboardInterrupt:
 		pass
 	finally:
-		riunet_inferencer.destroy_node()
+		model_inferencer.destroy_node()
 		rclpy.shutdown()
 
 if __name__ == '__main__':
