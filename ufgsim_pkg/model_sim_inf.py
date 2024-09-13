@@ -33,8 +33,8 @@ class SIMModelInferencer(Node):
 		self.declare_parameter('fov_down', -15.0)
 		self.declare_parameter('width', 440)
 		self.declare_parameter('height', 16)
-        self.declare_parameter('yaml_path', '../../model/ufg-sim.yaml')
-        self.declare_parameter('model_path', '../../model/ufgsim_mvlidarnet.ckpt')
+		self.declare_parameter('yaml_path', os.path.join(get_package_share_directory('ufgsim_pkg'),'config','ufg-sim.yaml'))
+		self.declare_parameter('model_path', '')
 
         model_name = self.get_parameter('model_name').get_parameter_value().string_value
         in_channels = self.get_parameter('in_channels').get_parameter_value().integer_value
