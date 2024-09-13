@@ -89,6 +89,7 @@ class RIUNetInferencer(Node):
 
 		# Convert to float32 before passing to the model
 		frame = item['frame'].astype(np.float32)
+<<<<<<< HEAD
 
 		# ldm = SemanticSegmentationSimLDM()
 		# ldm.setup('predict')
@@ -110,6 +111,12 @@ class RIUNetInferencer(Node):
 		self.model.load_state_dict(loaded_model['state_dict'], strict=False)
 		self.model.to(self.device)
 		self.model.eval()
+=======
+				
+		loaded_model = torch.load(self.model_path)
+		loaded_model.to(self.device)
+		loaded_model.eval()
+>>>>>>> bc74b92895b57e4829d6723593277c5640d670aa
 		
 		with torch.no_grad():
 			frame = np.expand_dims(frame, 0)
