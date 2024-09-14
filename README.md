@@ -2,11 +2,15 @@
 
 ## Overview
 
-The UFGSim package provides a ROS 2 node for running semantic segmentation inference using the RIUNet model.
+The UFGSim package provides a ROS 2 node for running semantic segmentation inference using a pre-trained model.
+
+Current models:
+- RIUNet
+- MVLidarNet
 
 ## Features
 
-- **Semantic Segmentation**: The node uses the RIUNet model for semantic segmentation on point cloud data.
+- **Semantic Segmentation**: The node uses a model for semantic segmentation on point cloud data.
 - **Customizable Parameters**: You can adjust various parameters such as the field of view, image dimensions, and paths to the model and configuration files.
 - **ROS 2 Integration**: The node is fully integrated with ROS 2, making it easy to incorporate into larger robotics systems.
 
@@ -64,13 +68,16 @@ You can run the node directly using `ros2 run` or via a launch file.
 To run the node directly:
 
 ```bash
-ros2 run ufgsim_pkg riunet_inf --ros-args -p model_path:=/path/to/your/model.ckpt
+ros2 run ufgsim_pkg model_sim_inf --ros-args -p model_path:=/path/to/your/model.ckpt
 ```
 
 ### Parameters
 
 The following parameters can be set when running the node:
 
+- **model_name**: The name of the model for the inference. Default is `RIUNet`.
+- **in_channels**: The amount of input channels. Default is `4`.
+- **n_classes**: The amount of classes of the data. Default is `13`.
 - **fov_up**: The field of view upwards in degrees. Default is `15.0`.
 - **fov_down**: The field of view downwards in degrees. Default is `-15.0`.
 - **width**: The width of the projection image. Default is `440`.
@@ -87,10 +94,9 @@ You can also use a launch file to set parameters and run the node. This is parti
 To run the node using the launch file, execute the following command:
 
 ```bash
-ros2 launch ufgsim_pkg riunet_inf.launch.py model_path:=/path/to/your/model.ckpt
+ros2 launch ufgsim_pkg model_sim_inf.launch.py model_path:=/path/to/your/model.ckpt
 ```
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
