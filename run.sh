@@ -16,6 +16,8 @@ CONTAINER_FOLDER_PATH="/root/ros2_ws/src/ufgsim_pkg"
 
 # Run the Docker container with the selected image and configurations for GUI applications
 docker run -it \
+  --name colorcloud_ufgsim_container \
+  --rm \
   --user=root \
   --privileged \
   --network=host \
@@ -30,5 +32,5 @@ docker run -it \
   --gpus all \
   --env="NVIDIA_VISIBLE_DEVICES=all" \
   --env="NVIDIA_DRIVER_CAPABILITIES=all" \
-  --volume="$HOST_FOLDER_PATH:$CONTAINER_FOLDER_PATH:rw"
+  --volume="$HOST_FOLDER_PATH:$CONTAINER_FOLDER_PATH:rw" \
   $IMAGE_NAME

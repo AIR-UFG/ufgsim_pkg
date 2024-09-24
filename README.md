@@ -55,6 +55,29 @@ Make sure to source your workspace:
 source ~/ros2_ws/install/setup.bash
 ```
 
+## Docker Installation
+
+To use the docker image for this package, please follow the procedure described bellow:
+
+First, clone the repository and then build the docker image:
+
+```
+git clone https://github.com/AIR-UFG/ufgsim_pkg.git
+cd ufgsim_pkg
+docker build -t colorcloud_ufgsim -f docker/Dockerfile .
+```
+
+This process may take a while. 
+
+
+## Running the container
+
+Execute the bash script to instantiate the container:
+
+```
+./run.sh
+```
+
 ## Running the Node
 
 You can run the node directly using `ros2 run` or via a launch file.
@@ -66,6 +89,8 @@ To run the node directly:
 ```bash
 ros2 run ufgsim_pkg riunet_inf --ros-args -p model_path:=/path/to/your/model.ckpt
 ```
+
+In the case of docker container, be sure to place you model on the config path of the repository, since in the run.sh script we are passing the root directory of this package as volume. Then you can pass the path as described above.
 
 ### Parameters
 
