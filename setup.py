@@ -29,7 +29,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'riunet_inf = ufgsim_pkg.riunet_inf:main'
+            'model_sim_inf = ufgsim_pkg.model_sim_inf:main'
         ],
     },
 )
